@@ -1,0 +1,125 @@
+-- =============================================
+-- Railway Management System Database
+-- Author: Sanchit Singh
+-- Compatible with Python Project
+-- =============================================
+
+-- ===============================
+-- 1. CREATE DATABASE
+-- ===============================
+CREATE DATABASE railway;
+USE railway;
+
+-- ===============================
+-- 2. STATION TABLE (ADMIN)
+-- Stores station master data
+-- ===============================
+CREATE TABLE station (
+    station_id INT AUTO_INCREMENT PRIMARY KEY,
+    station_name VARCHAR(100) NOT NULL,
+    station_code VARCHAR(10) UNIQUE NOT NULL,
+    city VARCHAR(50),
+    platforms INT
+);
+
+-- ===============================
+-- 3. TRAIN TABLE (ADMIN)
+-- Stores train master details
+-- ===============================
+CREATE TABLE train (
+    train_id INT AUTO_INCREMENT PRIMARY KEY,
+    train_name VARCHAR(100) NOT NULL,
+    total_seats INT NOT NULL
+);
+
+-- ===============================
+-- 4. PASSENGER TABLE (USER)
+-- Stores passenger details
+-- ===============================
+CREATE TABLE passenger (
+    passenger_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    age INT,
+    gender VARCHAR(10)
+);
+
+-- ===============================
+-- 5. RESERVATION TABLE (MAIN)
+-- Links passenger + train + stations
+-- Core table of system
+-- ===============================
+CREATE TABLE reservation (
+    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    passenger_id INT,
+    train_id INT,
+    
+    source_station INT,
+    destination_station INT,
+    
+    journey_date DATE,
+    seat_number VARCHAR(10),
+
+    -- Foreign Keys
+    FOREIGN KEY (passenger_id) REFERENCES passenger(passenger_id),
+    FOREIGN KEY (train_id) REFERENCES train(train_id),
+    FOREIGN KEY (source_station) REFERENCES station(station_id),
+    FOREIGN KEY (destination_station) REFERENCES station(station_id)
+);
+
+-- =============================================
+-- OPTIONAL SAMPLE DATA (FOR TESTING / DEMO)
+-- Helps in Viva demonstration
+-- =============================================
+
+-- Sample Stations
+INSERT INTO station (station_name, station_code, city, platforms)
+VALUES
+('New Delhi Railway Station','NDLS','Delhi',16),
+('Bareilly Junction','BE','Bareilly',8),
+('Lucknow Junction','LJN','Lucknow',10);
+
+-- Sample Trains
+INSERT INTO train (train_name, total_seats)
+VALUES
+('Rajdhani Express', 500),
+('Shatabdi Express', 300),
+('Intercity Express', 400);
+
+-- Sample Passenger
+INSERT INTO passenger (name, age, gender)
+VALUES ('Sanchit Singh', 20, 'Male');
+
+-- =============================================
+-- USEFUL VIVA QUERIES
+-- =============================================
+
+-- View All Tables
+SHOW TABLES;
+
+-- View Stations
+SELECT * FROM station;
+
+-- View Trains
+SELECT * FROM train;
+
+-- View Passengers
+SELECT * FROM passenger;
+
+-- View Reservations
+SELECT * FROM reservation;
+
+-- Join Query (Advanced Viva Question)
+SELECT 
+    r.reservation_id,
+    p.name AS Passenger,
+    t.train_name,
+    s1.station_name AS Source,
+    s2.station_name AS Destination,
+    r.journey_date,
+    r.seat_number
+FROM reservation r
+JOIN passenger p ON r.passenger_id = p.passenger_id
+JOIN train t ON r.train_id = t.train_id
+JOIN station s1 ON r.source_station = s1.station_id
+JOIN station s2 ON r.destination_station = s2.station_id;
